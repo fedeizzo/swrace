@@ -1,2 +1,3 @@
 #!/bin/bash
-/usr/bin/g++ -DEVAL -std=c++11 -02 -pipe -o swrace swrace.cpp grader.cpp
+/usr/bin/g++ -DEVAL -std=gnu++11 -O2 -pipe -static -s -o swrace swrace.cpp grader.cpp
+# /usr/bin/g++ -DEVAL -std=gnu++11 -O2 -pipe -static -s -o tester tester.cpp grader.cpp

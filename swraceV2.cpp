@@ -184,164 +184,6 @@ char whiteChooise(char lastChar, char c) {
     return 'A';
 }
 
-int blackLost(int **track, const int **circles, const int *i, const int *j,
-              const int *N, const int *M, const int *sentinel) {
-  // P for current position (i, j)
-  // V for visited
-  // B for black
-  int lost = 0;
-  // here a check this case
-  // V B P
-  if (*j + 2 < *M && track[*i][*j + 2] == *sentinel &&
-      circles[*i][*j + 1] == BLACK) {
-    lost++;
-  }
-  // here a check this case
-  // P B V
-  if (*j - 2 >= 0 && track[*i][*j - 2] == *sentinel &&
-      circles[*i][*j - 1] == BLACK) {
-    lost++;
-  }
-
-  // here a check this case
-  // P
-  // B
-  // V
-  if (*i + 2 < *N && track[*i + 2][*j] == *sentinel &&
-      circles[*i + 1][*j] == BLACK) {
-    lost++;
-  }
-
-  // here a check this case
-  // V
-  // B
-  // P
-  if (*i - 2 >= 0 && track[*i - 2][*j] == *sentinel &&
-      circles[*i - 1][*j] == BLACK) {
-    lost++;
-  }
-  return lost;
-}
-
-int whiteLost(int **track, const int **circles, const int *i, const int *j,
-              const int *N, const int *M, const int *sentinel) {
-  // P for current position (i, j)
-  // V for visited
-  // W for white
-  int lost = 0;
-  if (*i - 1 >= 0 && *j - 1 >= 0 && track[*i - 1][*j - 1] == *sentinel) {
-    // here a check this case
-    // V W
-    //   P
-    if (circles[*i - 1][*j] == WHITE)
-      lost++;
-    // here a check this case
-    // V
-    // W P
-    if (circles[*i][*j - 1] == WHITE)
-      lost++;
-  }
-
-  if (*i + 1 < *N && *j + 1 < *M && track[*i + 1][*j + 1] < *sentinel) {
-    // here a check this case
-    // P W
-    //   V
-    if (circles[*i + 1][*j] == WHITE)
-      lost++;
-    // here a check this case
-    // P
-    // W V
-    if (circles[*i][*j + 1] == WHITE)
-      lost++;
-  }
-
-  if (*i - 1 >= 0 && *j + 1 < *M && track[*i - 1][*j + 1] > *sentinel) {
-    // here a check this case
-    // W V
-    // P
-    if (circles[*i - 1][*j] == WHITE)
-      lost++;
-    // here a check this case
-    //   V
-    // P W
-    if (circles[*i][*j + 1] == WHITE)
-      lost++;
-  }
-
-  if (*i + 1 < *N && *j - 1 >= 0 && track[*i + 1][*j - 1] > *sentinel) {
-    // here a check this case
-    // W P
-    // V
-    if (circles[*i][*j - 1] == WHITE)
-      lost++;
-    // here a check this case
-    //   P
-    // V W
-    if (circles[*i + 1][*j] == WHITE)
-      lost++;
-  }
-
-  return lost;
-}
-
-char allowedMovement(char lastMovement, int movementConstraint) {
-  if (movementConstraint == 1) {
-    if (lastMovement == 'D' || lastMovement || 'U')
-      return 'H';
-    else
-      return 'O';
-  } else if (movementConstraint == 2) {
-    if (lastMovement == 'D' || lastMovement || 'U')
-      return 'O';
-    else
-      return 'H';
-  } else {
-    return 'A';
-  }
-}
-
-// 0 no movement constraint
-// 1 ortogonal movement
-// 2 parallel movement
-void bruteRec(int **track, const int **circles, const int *N, const int *M,
-              int i, int j, int sentinel, int movementConstraint,
-              const int *tot, int found, int lost, char *soluz,
-              int soluzIndex) {
-  if (*tot - found - lost < bestSolution - found) {
-    return;
-  } else {
-    lost = lost + whiteLost(track, circles, &i, &j, N, M, &sentinel) +
-           blackLost(track, circles, &i, &j, N, M, &sentinel);
-    char direction = allowedMovement(soluz[soluzIndex], movementConstraint);
-    if (movementConstraint == 1 && direction == 'H') {
-      if (i + 1 < *N && circles[i + 1][j] != BLACK &&
-          track[i + 1][j] > sentinel) {
-        soluz[++soluzIndex] = 'R';
-        if (circles[i][j] == WHITE) {
-          bruteRec(track, circles, N, M, i + 1, j, sentinel + 1, 0, tot,
-                   found + 1, lost, soluz, soluzIndex);
-        } else {
-          bruteRec(track, circles, N, M, i + 1, j, sentinel + 1, 0, tot, found,
-                   lost, soluz, soluzIndex);
-        }
-        soluzIndex--;
-      }
-      if (i - 1 >= 0 && circles[i - 1][j] != BLACK &&
-          track[i - 1][j] > sentinel) {
-        soluz[++soluzIndex] = 'L';
-        if (circles[i][j] == WHITE) {
-          bruteRec(track, circles, N, M, i - 1, j, sentinel + 1, 0, tot,
-                   found + 1, lost, soluz, soluzIndex);
-        } else {
-          bruteRec(track, circles, N, M, i + 1, j, sentinel + 1, 0, tot, found,
-                   lost, soluz, soluzIndex);
-        }
-        soluzIndex--;
-      }
-    }
-  }
-}
-
 void algoritmoTontoloRec(ofstream &out, const int startX, const int startY,
                          int i, int j, int N, int M, int circleFound,
                          int totalCircle, int **track, int **circles,
@@ -361,10 +203,10 @@ void algoritmoTontoloRec(ofstream &out, const int startX, const int startY,
       if (soluzIndex > 0) {
         chooise = blackChooise(soluz[soluzIndex]);
         if (chooise == 'H') {
-          if (j + 1 < M && track[i][j + 1] > sentinel) {
+          if (j + 1 < M && track[i][j + 1] < sentinel) {
             soluz[++soluzIndex] = 'R';
             blocked = false;
-          } else if (j - 1 >= 0 && track[i][j - 1] > sentinel) {
+          } else if (j - 1 >= 0 && track[i][j - 1] < sentinel) {
             soluz[++soluzIndex] = 'L';
             blocked = false;
           }
@@ -510,8 +352,7 @@ void algoritmoTontolo(const int N, const int M, int **track, int **circles,
   int counter = 1;
   /* cout << circles[4][3] << endl; */
   /* cout << circles[3][4] << endl; */
-  /* algoritmoTontoloRec(out, 0, 0, 0, 0, N, M, 0, totalCircle, track,
-   * circles,
+  /* algoritmoTontoloRec(out, 0, 0, 0, 0, N, M, 0, totalCircle, track, circles,
    */
   /*                     counter++, soluz, 0, false); */
   for (int i = 0; i < N; i++)
