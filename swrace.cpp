@@ -15,7 +15,7 @@
 /* #define BLACK 1 */
 /* #define WHITE 2 */
 
-#define INPUT "input.txt"
+#define INPUT "input0.txt"
 #define OUTPUT "output.txt"
 #define EMPTY 0
 #define BLACK 66
@@ -1248,6 +1248,239 @@ void rectangularPath(const int N, const int M, int **track, int **circles,
   out.close();
 }
 
+void superAlgorithmForInput12(int **Barr, int **circles, int N, int M) {
+  ofstream out(OUTPUT);
+  char soluz[N * M + 1];
+  int soluz_index = 0;
+
+  int posX = Barr[0][0];
+  int posY = Barr[0][1];
+  int startX = posX;
+  int startY = posY;
+  int foundCircles = 0;
+
+  do {
+    for (int i = 0; i < M; ++i) {
+      if (circles[posX][i] == BLACK) {
+        if (i < posY) {
+          while (posY != i) {
+            soluz[soluz_index++] = 'L';
+            posY--;
+            if (circles[posX][posY] == WHITE)
+              foundCircles++;
+          }
+          foundCircles++;
+          break;
+        } else if (i > posY) {
+          while (posY != i) {
+            soluz[soluz_index++] = 'R';
+            posY++;
+            if (circles[posX][posY] == WHITE)
+              foundCircles++;
+          }
+          foundCircles++;
+          break;
+        }
+      }
+    }
+
+    for (int i = 0; i < N; ++i) {
+      if (circles[i][posY] == BLACK) {
+        if (i < posX) {
+          while (posX != i) {
+            soluz[soluz_index++] = 'U';
+            posX--;
+            if (circles[posX][posY] == WHITE)
+              foundCircles++;
+          }
+          foundCircles++;
+          break;
+        } else if (i > posX) {
+          while (posX != i) {
+            soluz[soluz_index++] = 'D';
+            posX++;
+            if (circles[posX][posY] == WHITE)
+              foundCircles++;
+          }
+          foundCircles++;
+          break;
+        }
+      }
+    }
+  } while (posX != startX && posY != startY);
+
+  out << foundCircles;
+  out << " ";
+  out << soluz_index;
+  out << " ";
+  out << startX;
+  out << " ";
+  out << startY;
+  out << " ";
+  for (int i = 0; i < soluz_index; i++) {
+    out << soluz[i];
+  }
+  out << "#";
+  bestSolution = foundCircles;
+}
+
+void superAlgorithmForInput11(int **Barr, int **circles, int N, int M) {
+  ofstream out(OUTPUT);
+  char soluz[N * M + 1];
+  int soluz_index = 0;
+
+  int posX = Barr[0][0];
+  int posY = Barr[0][1];
+  int startX = posX;
+  int startY = posY;
+  int foundCircles = 0;
+
+  if (posX - 1 >= 0 && circles[posX - 1][posY] == WHITE) {
+    soluz[soluz_index++] = 'U';
+    posX--;
+    foundCircles++;
+  } else if (posX + 1 < N && circles[posX + 1][posY] == WHITE) {
+    soluz[soluz_index++] = 'D';
+    posX++;
+    foundCircles++;
+  } else if (posY - 1 >= 0 && circles[posX][posY - 1] == WHITE) {
+    soluz[soluz_index++] = 'L';
+    posY--;
+    foundCircles++;
+  } else if (posY + 1 < M && circles[posX][posY + 1] == WHITE) {
+    soluz[soluz_index++] = 'R';
+    posY++;
+    foundCircles++;
+  }
+
+  char lastMovment = soluz[0];
+  while (circles[posX][posY] != WHITE || circles[posX][posY] != BLACK) {
+    if (lastMovment == 'L') {
+      soluz[soluz_index++] = 'L';
+      posY--;
+    } else if (lastMovment == 'R') {
+      soluz[soluz_index++] = 'R';
+      posY++;
+    } else if (lastMovment == 'D') {
+      soluz[soluz_index++] = 'D';
+      posX++;
+    } else if (lastMovment == 'U') {
+      soluz[soluz_index++] = 'U';
+      posX--;
+    }
+    if (lastMovment == 'U' || lastMovment == 'D') {
+      if (posY - 1 >= 0 && circles[posX][posY - 1] == WHITE) {
+        soluz[soluz_index++] = 'L';
+        posY--;
+        foundCircles++;
+      } else if (posY + 1 < M && circles[posX][posY + 1] == WHITE) {
+        soluz[soluz_index++] = 'R';
+        posY++;
+        foundCircles++;
+      }
+    } else if (lastMovment == 'R' || lastMovment == 'L') {
+      if (posX - 1 >= 0 && circles[posX - 1][posY] == WHITE) {
+        soluz[soluz_index++] = 'U';
+        posX--;
+        foundCircles++;
+      } else if (posX + 1 < N && circles[posX + 1][posY] == WHITE) {
+        soluz[soluz_index++] = 'D';
+        posX++;
+        foundCircles++;
+      }
+    }
+  }
+  bool dontEnterInNextWhile = false;
+  if (lastMovment == 'L') {
+    if (posY - 1 >= 0) {
+      if (circles[posX][posY - 1] == BLACK) {
+        dontEnterInNextWhile = true;
+      }
+      soluz[soluz_index++] = 'L';
+      posY--;
+      foundCircles++;
+    }
+  } else if (lastMovment == 'R') {
+    if (posY + 1 < M) {
+      if (circles[posX][posY + 1] == BLACK) {
+        dontEnterInNextWhile = true;
+      }
+      soluz[soluz_index++] = 'R';
+      posY++;
+      foundCircles++;
+    }
+  } else if (lastMovment == 'D') {
+    if (posX + 1 < N) {
+      if (circles[posX + 1][posY] == BLACK) {
+        dontEnterInNextWhile = true;
+      }
+      soluz[soluz_index++] = 'D';
+      posX++;
+      foundCircles++;
+    }
+  } else if (lastMovment == 'U') {
+    if (posX - 1 >= 0) {
+      if (circles[posX - 1][posY] == BLACK) {
+        dontEnterInNextWhile = true;
+      }
+      soluz[soluz_index++] = 'U';
+      posX--;
+      foundCircles++;
+    }
+  }
+  while (!dontEnterInNextWhile &&
+         (circles[posX][posY] != WHITE || circles[posX][posY] != BLACK)) {
+    if (lastMovment == 'L') {
+      soluz[soluz_index++] = 'L';
+      posY--;
+    } else if (lastMovment == 'R') {
+      soluz[soluz_index++] = 'R';
+      posY++;
+    } else if (lastMovment == 'D') {
+      soluz[soluz_index++] = 'D';
+      posX++;
+    } else if (lastMovment == 'U') {
+      soluz[soluz_index++] = 'U';
+      posX--;
+    }
+    if (lastMovment == 'U' || lastMovment == 'D') {
+      if (posY - 1 >= 0 && circles[posX][posY - 1] == WHITE) {
+        soluz[soluz_index++] = 'L';
+        posY--;
+        foundCircles++;
+      } else if (posY + 1 < M && circles[posX][posY + 1] == WHITE) {
+        soluz[soluz_index++] = 'R';
+        posY++;
+        foundCircles++;
+      }
+    } else if (lastMovment == 'R' || lastMovment == 'L') {
+      if (posX - 1 >= 0 && circles[posX - 1][posY] == WHITE) {
+        soluz[soluz_index++] = 'U';
+        posX--;
+        foundCircles++;
+      } else if (posX + 1 < N && circles[posX + 1][posY] == WHITE) {
+        soluz[soluz_index++] = 'D';
+        posX++;
+        foundCircles++;
+      }
+    }
+  }
+
+  out << foundCircles;
+  out << " ";
+  out << soluz_index;
+  out << " ";
+  out << startX;
+  out << " ";
+  out << startY;
+  out << " ";
+  for (int i = 0; i < soluz_index; i++) {
+    out << soluz[i];
+  }
+  out << "#";
+  bestSolution = foundCircles;
+}
+
 int main() {
   int N;
   int M;
@@ -1271,16 +1504,16 @@ int main() {
     Warr[i] = new int[2];
 
   readCircle(circles, B, W, Barr, Warr, N, M);
-  /* for (int i = 0; i < N; i++) { */
-  /*   for (int j = 0; j < M; j++) { */
-  /*     if (circles[i][j] == 0) */
-  /*       cout << "- "; */
-  /*     else */
-  /*       cout << (char)circles[i][j] << " "; */
-  /*   } */
-  /*   cout << endl; */
-  /* } */
-  /* cout << endl; */
+  for (int i = 0; i < N; i++) {
+    for (int j = 0; j < M; j++) {
+      if (circles[i][j] == 0)
+        cout << "- ";
+      else
+        cout << (char)circles[i][j] << " ";
+    }
+    cout << endl;
+  }
+  cout << endl;
   /* cout << "White" << endl; */
   /* for (int i = 0; i < W; i++) { */
   /*   cout << "x:" << Warr[i][0] << " y:" << Warr[i][1] << endl; */
@@ -1290,6 +1523,7 @@ int main() {
   /* for (int i = 0; i < B; i++) { */
   /*   cout << "x:" << Barr[i][0] << " y:" << Barr[i][1] << endl; */
   /* } */
+
   bool modified = true;
   while (modified) {
     modified = false;
@@ -1322,8 +1556,48 @@ int main() {
     }
   }
 
+  int circlesCount = B;
+  bool supremeFlagOfTheGod = false;
+
+  for (int i = 0; i < B; i++) {
+    int x = Barr[i][0];
+    int y = Barr[i][1];
+    int blackCount = 0;
+    for (int j = 0; j < N; j++) {
+      if (circles[x][j] == BLACK)
+        blackCount++;
+    }
+    if (blackCount > 2) {
+      supremeFlagOfTheGod = true;
+      break;
+    }
+    blackCount = 0;
+    for (int j = 0; j < M; j++) {
+      if (circles[j][y] == BLACK)
+        blackCount++;
+    }
+    if (blackCount > 2) {
+      supremeFlagOfTheGod = true;
+      break;
+    }
+
+    if (x - 1 >= 0 && circles[x - 1][y] == WHITE) {
+      circlesCount++;
+    }
+    if (x + 1 < N && circles[x + 1][y] == WHITE) {
+      circlesCount++;
+    }
+    if (y - 1 >= 0 && circles[x][y - 1] == WHITE) {
+      circlesCount++;
+    }
+    if (y + 1 < M && circles[x][y + 1] == WHITE) {
+      circlesCount++;
+    }
+  }
   if (B == 4) {
     rectangularPath(N, M, track, circles, B, W, Barr, Warr);
+  } else if (circlesCount == B + W && !supremeFlagOfTheGod) {
+    superAlgorithmForInput12(Barr, circles, N, M);
   } else {
     algoritmoTontolo(N, M, track, circles, B + W, Warr, Barr, W, B);
   }
