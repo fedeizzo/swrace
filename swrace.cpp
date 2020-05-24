@@ -1,13 +1,13 @@
-#include <cstdint>
-#include <cstdlib>
 #include <fcntl.h>
-#include <limits>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
+#include <cstdint>
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <limits>
 
 /* #include "swrace.h" */
 
@@ -15,7 +15,7 @@
 /* #define BLACK 1 */
 /* #define WHITE 2 */
 
-#define INPUT "input0.txt"
+#define INPUT "input.txt"
 #define OUTPUT "output.txt"
 #define EMPTY 0
 #define BLACK 66
@@ -49,22 +49,22 @@ void readBuildInfo(int *N, int *M, int *B, int *W) {
     }
     dst = 'a';
     switch (contentRead) {
-    case 0:
-      sscanf(content, "%d", N);
-      contentRead++;
-      break;
-    case 1:
-      sscanf(content, "%d", M);
-      contentRead++;
-      break;
-    case 2:
-      sscanf(content, "%d", B);
-      contentRead++;
-      break;
-    case 3:
-      sscanf(content, "%d", W);
-      contentRead++;
-      break;
+      case 0:
+        sscanf(content, "%d", N);
+        contentRead++;
+        break;
+      case 1:
+        sscanf(content, "%d", M);
+        contentRead++;
+        break;
+      case 2:
+        sscanf(content, "%d", B);
+        contentRead++;
+        break;
+      case 3:
+        sscanf(content, "%d", W);
+        contentRead++;
+        break;
     }
   }
   /* cout << *N << " "; */
@@ -177,20 +177,20 @@ void readCircle(int **track, int B, int W, int **Barr, int **Warr, int N,
 
 char blackChooise(char c) {
   switch (c) {
-  case 'U':
-    return 'H';
-    break;
-  case 'R':
-    return 'V';
-    break;
-  case 'D':
-    return 'H';
-    break;
-  case 'L':
-    return 'V';
-    break;
-  default:
-    return 'A';
+    case 'U':
+      return 'H';
+      break;
+    case 'R':
+      return 'V';
+      break;
+    case 'D':
+      return 'H';
+      break;
+    case 'L':
+      return 'V';
+      break;
+    default:
+      return 'A';
   }
 }
 
@@ -1227,7 +1227,7 @@ void rectangularPath(const int N, const int M, int **track, int **circles,
 
     // Print circes amount
     /* cout << endl << "circles_counter:" << circles_counter << endl; */
-    out << circles_counter + 4 << ' '; // circles_counter counts the white
+    out << circles_counter + 4 << ' ';  // circles_counter counts the white
 
     // Print path lenght
     /* cout << endl << "path lenght:" << soluz_index << endl; */
@@ -1324,7 +1324,7 @@ void superAlgorithmForInput12(int **Barr, int **circles, int N, int M) {
   bestSolution = foundCircles;
 }
 
-void superAlgorithmForInput11(int **Barr, int **circles, int N, int M) {
+bool LeaveMySpagettiCodeAlone(int **Barr, int **circles, int N, int M) {
   ofstream out(OUTPUT);
   char soluz[N * M + 1];
   int soluz_index = 0;
@@ -1333,137 +1333,214 @@ void superAlgorithmForInput11(int **Barr, int **circles, int N, int M) {
   int posY = Barr[0][1];
   int startX = posX;
   int startY = posY;
-  int foundCircles = 0;
-
+  int foundCircles = 0; // Starts from a Black
+  bool isCircleFreakingNotCompleted = true;
   if (posX - 1 >= 0 && circles[posX - 1][posY] == WHITE) {
-    soluz[soluz_index++] = 'U';
-    posX--;
-    foundCircles++;
+    soluz[soluz_index++] = 'U'; posX--;
   } else if (posX + 1 < N && circles[posX + 1][posY] == WHITE) {
-    soluz[soluz_index++] = 'D';
-    posX++;
-    foundCircles++;
+    soluz[soluz_index++] = 'D'; posX++;
   } else if (posY - 1 >= 0 && circles[posX][posY - 1] == WHITE) {
-    soluz[soluz_index++] = 'L';
-    posY--;
-    foundCircles++;
+    soluz[soluz_index++] = 'L'; posY--;
   } else if (posY + 1 < M && circles[posX][posY + 1] == WHITE) {
-    soluz[soluz_index++] = 'R';
-    posY++;
-    foundCircles++;
+    soluz[soluz_index++] = 'R'; posY++;
   }
+  foundCircles++; // First selected white
 
-  char lastMovment = soluz[0];
-  while (circles[posX][posY] != WHITE || circles[posX][posY] != BLACK) {
-    if (lastMovment == 'L') {
-      soluz[soluz_index++] = 'L';
-      posY--;
-    } else if (lastMovment == 'R') {
-      soluz[soluz_index++] = 'R';
-      posY++;
-    } else if (lastMovment == 'D') {
-      soluz[soluz_index++] = 'D';
-      posX++;
-    } else if (lastMovment == 'U') {
-      soluz[soluz_index++] = 'U';
-      posX--;
-    }
-    if (lastMovment == 'U' || lastMovment == 'D') {
-      if (posY - 1 >= 0 && circles[posX][posY - 1] == WHITE) {
-        soluz[soluz_index++] = 'L';
-        posY--;
-        foundCircles++;
-      } else if (posY + 1 < M && circles[posX][posY + 1] == WHITE) {
-        soluz[soluz_index++] = 'R';
-        posY++;
-        foundCircles++;
+  while (isCircleFreakingNotCompleted && (circles[posX][posY] != WHITE || circles[posX][posY] != BLACK) && posY - 1 >= 0 && posY + 1 < M && posX - 1 >= 0 && posX + 1 < N) {
+    if (circles[posX][posY] == WHITE) {
+      foundCircles++;
+      if (soluz[soluz_index - 1] == 'U') {
+        soluz[soluz_index++] = 'U'; posX--;
+        if (circles[posX][posY] == BLACK) {
+          foundCircles++;
+          if (posX == startX && posY == startY) {
+            foundCircles--;
+            isCircleFreakingNotCompleted = false;
+          } else if(circles[posX][posY - 1] == WHITE) {
+            soluz[soluz_index++] = 'L'; posY--;
+          } else if(circles[posX][posY + 1] == WHITE) {
+            soluz[soluz_index++] = 'R'; posY++;
+          }
+        } else if (circles[posX][posY] == WHITE) {
+          // White after a white, now doing nothing
+        } else if (circles[posX - 1][posY - 1] == WHITE) {
+          soluz[soluz_index++] = 'L'; posY--;
+          soluz[soluz_index++] = 'U'; posX--;
+        } else if (circles[posX - 1][posY + 1] == WHITE) {
+          soluz[soluz_index++] = 'R'; posY++;
+          soluz[soluz_index++] = 'U'; posX--;
+        }
+      } else if (soluz[soluz_index - 1] == 'L') {
+        soluz[soluz_index++] = 'L'; posY--;
+        if (circles[posX][posY] == BLACK) {
+          foundCircles++;
+          if (posX == startX && posY == startY) {
+            foundCircles--;
+            isCircleFreakingNotCompleted = false;
+          } else if(circles[posX + 1][posY] == WHITE) {
+            soluz[soluz_index++] = 'D'; posX++;
+          } else if(circles[posX - 1][posY] == WHITE) {
+            soluz[soluz_index++] = 'U'; posX--;
+          }
+        } else if (circles[posX - 1][posY - 1] == WHITE) {
+          soluz[soluz_index++] = 'U'; posX--;
+          soluz[soluz_index++] = 'L'; posY--;
+        } else if (circles[posX + 1][posY - 1] == WHITE) {
+          soluz[soluz_index++] = 'D'; posX++;
+          soluz[soluz_index++] = 'L'; posY--;
+        }
+      } else if (soluz[soluz_index - 1] == 'D') {
+        soluz[soluz_index++] = 'D'; posX++;
+        if (circles[posX][posY] == BLACK) {
+          foundCircles++;
+          if (posX == startX && posY == startY) {
+            foundCircles--;
+            isCircleFreakingNotCompleted = false;
+          } else if(circles[posX][posY - 1] == WHITE) {
+            soluz[soluz_index++] = 'L'; posY--;
+          } else if (circles[posX][posY + 1] == WHITE) {
+            soluz[soluz_index++] = 'R'; posY++;
+          }
+        } else if (circles[posX + 1][posY - 1] == WHITE) {
+          soluz[soluz_index++] = 'L'; posY--;
+          soluz[soluz_index++] = 'D'; posX++;
+        } else if (circles[posX + 1][posY + 1] == WHITE) {
+          soluz[soluz_index++] = 'R'; posY++;
+          soluz[soluz_index++] = 'D'; posX++;
+        }
+      } else if (soluz[soluz_index - 1] == 'R') {
+        soluz[soluz_index++] = 'R'; posY++;
+        if (circles[posX][posY] == BLACK) {
+          foundCircles++;
+          if (posX == startX && posY == startY) {
+            foundCircles--;
+            isCircleFreakingNotCompleted = false;
+          } else if(circles[posX + 1][posY] == WHITE) {
+            soluz[soluz_index++] = 'D'; posX++;
+          } else if(circles[posX - 1][posY] == WHITE) {
+            soluz[soluz_index++] = 'U'; posX--;
+          }
+        } else if (circles[posX - 1][posY + 1] == WHITE) {
+          soluz[soluz_index++] = 'U'; posX--;
+          soluz[soluz_index++] = 'R'; posY++;
+        } else if (circles[posX + 1][posY + 1] == WHITE) {
+          soluz[soluz_index++] = 'D'; posX++;
+          soluz[soluz_index++] = 'R'; posY++;
+        }
       }
-    } else if (lastMovment == 'R' || lastMovment == 'L') {
-      if (posX - 1 >= 0 && circles[posX - 1][posY] == WHITE) {
-        soluz[soluz_index++] = 'U';
-        posX--;
+    } else if (circles[posX][posY] == BLACK) {
+      if (posX == startX && posY == startY) {
+        foundCircles--;
+        isCircleFreakingNotCompleted = false;
+      } else {
         foundCircles++;
-      } else if (posX + 1 < N && circles[posX + 1][posY] == WHITE) {
-        soluz[soluz_index++] = 'D';
-        posX++;
-        foundCircles++;
+        int theNextBlack = -1;
+        char nextDirection = 'x';
+        if (soluz[soluz_index - 1] == 'U' || soluz[soluz_index - 1] == 'D'){ // Check row
+          if(circles[posX][posY - 1] == WHITE) {
+            soluz[soluz_index++] = 'L'; posY--;
+          } else if(circles[posX][posY + 1] == WHITE) {
+            soluz[soluz_index++] = 'R'; posY++;
+          } else {
+            if (posY != M-1) {
+              for (int i = posY+1; i < M; i++){ // Increasing, going right
+                if (circles[posX][i] == BLACK && theNextBlack == -1) {
+                  theNextBlack = i;
+                  soluz[soluz_index++] = 'R'; posY++;
+                }
+              }
+            }
+            if (posY != 0) {
+              for (int i = posY-1; i >= 0; i--){ // Descreasing, going left
+                if (circles[posX][i] == BLACK && theNextBlack == -1) {
+                  theNextBlack = i;
+                  soluz[soluz_index++] = 'L'; posY--;
+                }
+              }
+            }
+          }
+        } else if (soluz[soluz_index - 1] == 'R' || soluz[soluz_index - 1] == 'L') { // Check column
+          if(circles[posX - 1][posY] == WHITE) {
+            soluz[soluz_index++] = 'U'; posX--;
+          } else if(circles[posX + 1][posY] == WHITE) {
+            soluz[soluz_index++] = 'D'; posX++;
+          } else {
+            if (posX != N-1) {
+              for (int i = posX+1; i < N; i++){ // Increasing, going down
+                if (circles[i][posY] == BLACK && theNextBlack == -1) {
+                  theNextBlack = i;
+                  soluz[soluz_index++] = 'D'; posX++;
+                }
+              }
+            }
+            if (posX != 0) {
+              for (int i = posX-1; i >= 0; i--){ // Descreasing, going up
+                if (circles[i][posY] == BLACK && theNextBlack == -1) {
+                  theNextBlack = i;
+                  soluz[soluz_index++] = 'U'; posX--;
+                }
+              }
+            }
+          }
+        } else {
+          cout << "Error: What shoud it be?";
+        }
+      }
+        
+      // else {
+      //   cout << "theNextBlack " << theNextBlack << endl;
+      //   if (nextDirection == 'U') {
+      //     while (circles[posX][posY] != BLACK) {
+      //       soluz[soluz_index++] = 'U'; posX--;
+      //     }
+      //   } else if (nextDirection == 'D') {
+      //     while (circles[posX][posY] != BLACK) {
+      //       soluz[soluz_index++] = 'D'; posX++;
+      //     }
+      //   } else if (nextDirection == 'L') {
+      //     while (circles[posX][posY] != BLACK) {
+      //       soluz[soluz_index++] = 'L'; posY--;
+      //     }
+      //   } else if (nextDirection == 'R') {
+      //     while (circles[posX][posY] != BLACK) {
+      //       cout << "Inside while" << endl;
+      //       soluz[soluz_index++] = 'R'; posY++;
+      //     }
+      //     cout << "Outside while" << endl;
+      //   } else { 
+      //     cout << "Error in getting direction" << endl;
+      //   }
+      // }
+      
+      // isCircleFreakingNotCompleted = false;
+
+    } else {
+      if (soluz[soluz_index - 1] == 'L') {
+        soluz[soluz_index++] = 'L'; posY--;
+      } else if (soluz[soluz_index - 1] == 'R') {
+        soluz[soluz_index++] = 'R'; posY++;
+      } else if (soluz[soluz_index - 1] == 'D') {
+        soluz[soluz_index++] = 'D'; posX++;
+      } else if (soluz[soluz_index - 1] == 'U') {
+        soluz[soluz_index++] = 'U'; posX--;
       }
     }
   }
-  bool dontEnterInNextWhile = false;
-  if (lastMovment == 'L') {
-    if (posY - 1 >= 0) {
-      if (circles[posX][posY - 1] == BLACK) {
-        dontEnterInNextWhile = true;
-      }
-      soluz[soluz_index++] = 'L';
-      posY--;
+  // TODO remove foundCircles above
+  posX = startX;
+  posY = startY;
+  foundCircles = 0;
+  for (int i = 0; i < soluz_index; i++) {
+    if (circles[posX][posY] == BLACK || circles[posX][posY] == WHITE)
       foundCircles++;
-    }
-  } else if (lastMovment == 'R') {
-    if (posY + 1 < M) {
-      if (circles[posX][posY + 1] == BLACK) {
-        dontEnterInNextWhile = true;
-      }
-      soluz[soluz_index++] = 'R';
-      posY++;
-      foundCircles++;
-    }
-  } else if (lastMovment == 'D') {
-    if (posX + 1 < N) {
-      if (circles[posX + 1][posY] == BLACK) {
-        dontEnterInNextWhile = true;
-      }
-      soluz[soluz_index++] = 'D';
-      posX++;
-      foundCircles++;
-    }
-  } else if (lastMovment == 'U') {
-    if (posX - 1 >= 0) {
-      if (circles[posX - 1][posY] == BLACK) {
-        dontEnterInNextWhile = true;
-      }
-      soluz[soluz_index++] = 'U';
+    if (soluz[i] == 'U')
       posX--;
-      foundCircles++;
-    }
-  }
-  while (!dontEnterInNextWhile &&
-         (circles[posX][posY] != WHITE || circles[posX][posY] != BLACK)) {
-    if (lastMovment == 'L') {
-      soluz[soluz_index++] = 'L';
-      posY--;
-    } else if (lastMovment == 'R') {
-      soluz[soluz_index++] = 'R';
-      posY++;
-    } else if (lastMovment == 'D') {
-      soluz[soluz_index++] = 'D';
+    else if (soluz[i] == 'D')
       posX++;
-    } else if (lastMovment == 'U') {
-      soluz[soluz_index++] = 'U';
-      posX--;
-    }
-    if (lastMovment == 'U' || lastMovment == 'D') {
-      if (posY - 1 >= 0 && circles[posX][posY - 1] == WHITE) {
-        soluz[soluz_index++] = 'L';
-        posY--;
-        foundCircles++;
-      } else if (posY + 1 < M && circles[posX][posY + 1] == WHITE) {
-        soluz[soluz_index++] = 'R';
-        posY++;
-        foundCircles++;
-      }
-    } else if (lastMovment == 'R' || lastMovment == 'L') {
-      if (posX - 1 >= 0 && circles[posX - 1][posY] == WHITE) {
-        soluz[soluz_index++] = 'U';
-        posX--;
-        foundCircles++;
-      } else if (posX + 1 < N && circles[posX + 1][posY] == WHITE) {
-        soluz[soluz_index++] = 'D';
-        posX++;
-        foundCircles++;
-      }
-    }
+    else if (soluz[i] == 'L')
+      posY--;
+    else if (soluz[i] == 'R')
+      posY++;
   }
 
   out << foundCircles;
@@ -1479,6 +1556,7 @@ void superAlgorithmForInput11(int **Barr, int **circles, int N, int M) {
   }
   out << "#";
   bestSolution = foundCircles;
+  return !isCircleFreakingNotCompleted;
 }
 
 int main() {
@@ -1495,6 +1573,7 @@ int main() {
   int **circles = new int *[N];
   for (int i = 0; i < N; i++)
     circles[i] = new int[M];
+
   int **Barr = new int *[B];
   for (int i = 0; i < B; i++)
     Barr[i] = new int[2];
@@ -1504,16 +1583,18 @@ int main() {
     Warr[i] = new int[2];
 
   readCircle(circles, B, W, Barr, Warr, N, M);
-  for (int i = 0; i < N; i++) {
-    for (int j = 0; j < M; j++) {
-      if (circles[i][j] == 0)
-        cout << "- ";
-      else
-        cout << (char)circles[i][j] << " ";
-    }
-    cout << endl;
-  }
-  cout << endl;
+
+  // for (int i = 0; i < N; i++) {
+  //   for (int j = 0; j < M; j++) {
+  //     if (circles[i][j] == 0)
+  //       cout << "- ";
+  //     else
+  //       cout << (char)circles[i][j] << " ";
+  //   }
+  //   cout << endl;
+  // }
+  // cout << endl;
+
   /* cout << "White" << endl; */
   /* for (int i = 0; i < W; i++) { */
   /*   cout << "x:" << Warr[i][0] << " y:" << Warr[i][1] << endl; */
@@ -1524,41 +1605,41 @@ int main() {
   /*   cout << "x:" << Barr[i][0] << " y:" << Barr[i][1] << endl; */
   /* } */
 
-  bool modified = true;
-  while (modified) {
-    modified = false;
-    for (int i = 0; i < N; i++) {
-      for (int j = 0; j < M; j++) {
-        if (circles[i][j] == 0) {
-          if (j + 1 < M && circles[i][j + 1] != 0) {
-            if (circles[i][j + 1] != BLACK && circles[i][j + 1] != WHITE) {
-              circles[i][j] = circles[i][j + 1];
-              modified = true;
-            }
-          } else if (j - 1 >= 0 && circles[i][j - 1] != 0) {
-            if (circles[i][j - 1] != BLACK && circles[i][j - 1] != WHITE) {
-              circles[i][j] = circles[i][j - 1];
-              modified = true;
-            }
-          } else if (i + 1 < N && circles[i + 1][j] != 0) {
-            if (circles[i + 1][j] != BLACK && circles[i + 1][j] != WHITE) {
-              circles[i][j] = circles[i + 1][j];
-              modified = true;
-            }
-          } else if (i - 1 >= 0 && circles[i - 1][j] != 0) {
-            if (circles[i - 1][j] != BLACK && circles[i - 1][j] != WHITE) {
-              circles[i][j] = circles[i - 1][j];
-              modified = true;
-            }
-          }
-        }
-      }
-    }
-  }
+  // bool modified = true;
+  // while (modified) {
+  //   modified = false;
+  //   for (int i = 0; i < N; i++) {
+  //     for (int j = 0; j < M; j++) {
+  //       if (circles[i][j] == 0) {
+  //         if (j + 1 < M && circles[i][j + 1] != 0) {
+  //           if (circles[i][j + 1] != BLACK && circles[i][j + 1] != WHITE) {
+  //             circles[i][j] = circles[i][j + 1];
+  //             modified = true;
+  //           }
+  //         } else if (j - 1 >= 0 && circles[i][j - 1] != 0) {
+  //           if (circles[i][j - 1] != BLACK && circles[i][j - 1] != WHITE) {
+  //             circles[i][j] = circles[i][j - 1];
+  //             modified = true;
+  //           }
+  //         } else if (i + 1 < N && circles[i + 1][j] != 0) {
+  //           if (circles[i + 1][j] != BLACK && circles[i + 1][j] != WHITE) {
+  //             circles[i][j] = circles[i + 1][j];
+  //             modified = true;
+  //           }
+  //         } else if (i - 1 >= 0 && circles[i - 1][j] != 0) {
+  //           if (circles[i - 1][j] != BLACK && circles[i - 1][j] != WHITE) {
+  //             circles[i][j] = circles[i - 1][j];
+  //             modified = true;
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
 
+  // Caso 12
   int circlesCount = B;
   bool supremeFlagOfTheGod = false;
-
   for (int i = 0; i < B; i++) {
     int x = Barr[i][0];
     int y = Barr[i][1];
@@ -1567,7 +1648,7 @@ int main() {
       if (circles[x][j] == BLACK)
         blackCount++;
     }
-    if (blackCount > 2) {
+    if (blackCount != 2) {
       supremeFlagOfTheGod = true;
       break;
     }
@@ -1576,7 +1657,7 @@ int main() {
       if (circles[j][y] == BLACK)
         blackCount++;
     }
-    if (blackCount > 2) {
+    if (blackCount != 2) {
       supremeFlagOfTheGod = true;
       break;
     }
@@ -1594,19 +1675,23 @@ int main() {
       circlesCount++;
     }
   }
-  if (B == 4) {
+
+  if (LeaveMySpagettiCodeAlone(Barr, circles, N, M)) {
+    // Buona
+  } else if (B == 4) {
     rectangularPath(N, M, track, circles, B, W, Barr, Warr);
   } else if (circlesCount == B + W && !supremeFlagOfTheGod) {
     superAlgorithmForInput12(Barr, circles, N, M);
   } else {
     algoritmoTontolo(N, M, track, circles, B + W, Warr, Barr, W, B);
   }
-  for (int i = 0; i < N; i++) {
-    for (int j = 0; j < M; j++) {
-      cout << (char)circles[i][j] << " ";
-    }
-    cout << endl;
-  }
+
+  // for (int i = 0; i < N; i++) {
+  //   for (int j = 0; j < M; j++) {
+  //     cout << (char)circles[i][j] << " ";
+  //   }
+  //   cout << endl;
+  // }
 
   return 0;
 }
