@@ -1333,7 +1333,6 @@ bool LeaveMySpagettiCodeAlone(int **Barr, int **circles, int N, int M) {
   int posY = Barr[0][1];
   int startX = posX;
   int startY = posY;
-  int foundCircles = 0; // Starts from a Black
   bool isCircleFreakingNotCompleted = true;
   if (posX - 1 >= 0 && circles[posX - 1][posY] == WHITE) {
     soluz[soluz_index++] = 'U'; posX--;
@@ -1344,96 +1343,108 @@ bool LeaveMySpagettiCodeAlone(int **Barr, int **circles, int N, int M) {
   } else if (posY + 1 < M && circles[posX][posY + 1] == WHITE) {
     soluz[soluz_index++] = 'R'; posY++;
   }
-  foundCircles++; // First selected white
 
-  while (isCircleFreakingNotCompleted && (circles[posX][posY] != WHITE || circles[posX][posY] != BLACK) && posY - 1 >= 0 && posY + 1 < M && posX - 1 >= 0 && posX + 1 < N) {
+  while (isCircleFreakingNotCompleted && (circles[posX][posY] != WHITE || circles[posX][posY] != BLACK) && posY >= 0 && posY < M && posX >= 0 && posX < N) {
+
+    if (!(posY >= 0)) {
+      cout << "posY >= 0" << endl; 
+    }
+    if(!(posY + 1 < M)) {
+      cout << "posY + 1 < M" << endl; 
+    } 
+    if(!(posX >= 0)) {
+      cout << "posX >= 0" << endl; 
+    } 
+    if(!(posX + 1 < N)) {
+      cout << "posX + 1 < N" << endl; 
+    }
+
+
     if (circles[posX][posY] == WHITE) {
-      foundCircles++;
+      cout << "I'm white" << endl;
       if (soluz[soluz_index - 1] == 'U') {
+        cout << "Going up " << endl;
         soluz[soluz_index++] = 'U'; posX--;
         if (circles[posX][posY] == BLACK) {
-          foundCircles++;
           if (posX == startX && posY == startY) {
-            foundCircles--;
             isCircleFreakingNotCompleted = false;
-          } else if(circles[posX][posY - 1] == WHITE) {
+          } else if(posY - 1 >= 0 && circles[posX][posY - 1] == WHITE) {
             soluz[soluz_index++] = 'L'; posY--;
-          } else if(circles[posX][posY + 1] == WHITE) {
+          } else if(posY + 1 < M && circles[posX][posY + 1] == WHITE) {
             soluz[soluz_index++] = 'R'; posY++;
           }
         } else if (circles[posX][posY] == WHITE) {
+          cout << "Doing nothing" << endl;
           // White after a white, now doing nothing
-        } else if (circles[posX - 1][posY - 1] == WHITE) {
+        } else if (posX - 1 >= 0 && posY - 1 >= 0 && circles[posX - 1][posY - 1] == WHITE) {
           soluz[soluz_index++] = 'L'; posY--;
           soluz[soluz_index++] = 'U'; posX--;
-        } else if (circles[posX - 1][posY + 1] == WHITE) {
+        } else if (posX - 1 >= 0 && posY + 1 < M && circles[posX - 1][posY + 1] == WHITE) {
           soluz[soluz_index++] = 'R'; posY++;
           soluz[soluz_index++] = 'U'; posX--;
         }
       } else if (soluz[soluz_index - 1] == 'L') {
         soluz[soluz_index++] = 'L'; posY--;
         if (circles[posX][posY] == BLACK) {
-          foundCircles++;
           if (posX == startX && posY == startY) {
-            foundCircles--;
             isCircleFreakingNotCompleted = false;
-          } else if(circles[posX + 1][posY] == WHITE) {
+          } else if(posX + 1 < N && circles[posX + 1][posY] == WHITE) {
             soluz[soluz_index++] = 'D'; posX++;
-          } else if(circles[posX - 1][posY] == WHITE) {
+          } else if(posX - 1 >= 0 && circles[posX - 1][posY] == WHITE) {
             soluz[soluz_index++] = 'U'; posX--;
           }
-        } else if (circles[posX - 1][posY - 1] == WHITE) {
+        } else if (circles[posX][posY] == WHITE) {
+          // White after a white, now doing nothing
+        } else if (posX - 1 >= 0 && posY - 1 >= 0 && circles[posX - 1][posY - 1] == WHITE) {
           soluz[soluz_index++] = 'U'; posX--;
           soluz[soluz_index++] = 'L'; posY--;
-        } else if (circles[posX + 1][posY - 1] == WHITE) {
+        } else if (posX + 1 < N && posY - 1 >= 0 && circles[posX + 1][posY - 1] == WHITE) {
           soluz[soluz_index++] = 'D'; posX++;
           soluz[soluz_index++] = 'L'; posY--;
         }
       } else if (soluz[soluz_index - 1] == 'D') {
         soluz[soluz_index++] = 'D'; posX++;
         if (circles[posX][posY] == BLACK) {
-          foundCircles++;
           if (posX == startX && posY == startY) {
-            foundCircles--;
             isCircleFreakingNotCompleted = false;
-          } else if(circles[posX][posY - 1] == WHITE) {
+          } else if(posY - 1 >= 0 && circles[posX][posY - 1] == WHITE) {
             soluz[soluz_index++] = 'L'; posY--;
-          } else if (circles[posX][posY + 1] == WHITE) {
+          } else if (posY + 1 < M && circles[posX][posY + 1] == WHITE) {
             soluz[soluz_index++] = 'R'; posY++;
           }
-        } else if (circles[posX + 1][posY - 1] == WHITE) {
+        } else if (circles[posX][posY] == WHITE) {
+          // White after a white, now doing nothing
+        } else if (posX + 1 < N && posY - 1 >= 0 && circles[posX + 1][posY - 1] == WHITE) {
           soluz[soluz_index++] = 'L'; posY--;
           soluz[soluz_index++] = 'D'; posX++;
-        } else if (circles[posX + 1][posY + 1] == WHITE) {
+        } else if (posX + 1 < N && posY + 1 < M && circles[posX + 1][posY + 1] == WHITE) {
           soluz[soluz_index++] = 'R'; posY++;
           soluz[soluz_index++] = 'D'; posX++;
         }
       } else if (soluz[soluz_index - 1] == 'R') {
         soluz[soluz_index++] = 'R'; posY++;
         if (circles[posX][posY] == BLACK) {
-          foundCircles++;
           if (posX == startX && posY == startY) {
-            foundCircles--;
             isCircleFreakingNotCompleted = false;
-          } else if(circles[posX + 1][posY] == WHITE) {
+          } else if(posX + 1 < N && circles[posX + 1][posY] == WHITE) {
             soluz[soluz_index++] = 'D'; posX++;
-          } else if(circles[posX - 1][posY] == WHITE) {
+          } else if(posX - 1 >= 0 && circles[posX - 1][posY] == WHITE) {
             soluz[soluz_index++] = 'U'; posX--;
           }
-        } else if (circles[posX - 1][posY + 1] == WHITE) {
+        } else if (circles[posX][posY] == WHITE) {
+          // White after a white, now doing nothing
+        } else if (posX - 1 >= 0 && posY + 1 < M && circles[posX - 1][posY + 1] == WHITE) {
           soluz[soluz_index++] = 'U'; posX--;
           soluz[soluz_index++] = 'R'; posY++;
-        } else if (circles[posX + 1][posY + 1] == WHITE) {
+        } else if (posX + 1 < N && posY + 1 < M && circles[posX + 1][posY + 1] == WHITE) {
           soluz[soluz_index++] = 'D'; posX++;
           soluz[soluz_index++] = 'R'; posY++;
         }
       }
     } else if (circles[posX][posY] == BLACK) {
       if (posX == startX && posY == startY) {
-        foundCircles--;
         isCircleFreakingNotCompleted = false;
       } else {
-        foundCircles++;
         int theNextBlack = -1;
         char nextDirection = 'x';
         if (soluz[soluz_index - 1] == 'U' || soluz[soluz_index - 1] == 'D'){ // Check row
@@ -1529,7 +1540,7 @@ bool LeaveMySpagettiCodeAlone(int **Barr, int **circles, int N, int M) {
   // TODO remove foundCircles above
   posX = startX;
   posY = startY;
-  foundCircles = 0;
+  int foundCircles = 0;
   for (int i = 0; i < soluz_index; i++) {
     if (circles[posX][posY] == BLACK || circles[posX][posY] == WHITE)
       foundCircles++;
@@ -1675,10 +1686,12 @@ int main() {
       circlesCount++;
     }
   }
+  
+  // LeaveMySpagettiCodeAlone(Barr, circles, N, M);
 
   if (LeaveMySpagettiCodeAlone(Barr, circles, N, M)) {
     // Buona
-  } else if (B == 4) {
+  } else if (B == 4) { // Added also if it's slightly useless
     rectangularPath(N, M, track, circles, B, W, Barr, Warr);
   } else if (circlesCount == B + W && !supremeFlagOfTheGod) {
     superAlgorithmForInput12(Barr, circles, N, M);
