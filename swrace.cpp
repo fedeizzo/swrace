@@ -8,14 +8,18 @@
 #include <fstream>
 #include <iostream>
 #include <limits>
-
+#include <algorithm>
+#include <cmath>
+#include <math.h>
+#include <utility>
+#include <vector>
 /* #include "swrace.h" */
 
 /* #define EMPTY 0 */
 /* #define BLACK 1 */
 /* #define WHITE 2 */
 
-#define INPUT "input.txt"
+#define INPUT "input16.txt"
 #define OUTPUT "output.txt"
 #define EMPTY 0
 #define BLACK 66
@@ -1324,7 +1328,7 @@ void superAlgorithmForInput12(int **Barr, int **circles, int N, int M) {
   bestSolution = foundCircles;
 }
 
-bool LeaveMySpagettiCodeAlone(int **Barr, int **circles, int N, int M) {
+bool LeaveMySpaghettiCodeAlone(int **Barr, int **circles, int N, int M) {
   ofstream out(OUTPUT);
   char soluz[N * M + 1];
   int soluz_index = 0;
@@ -1334,6 +1338,7 @@ bool LeaveMySpagettiCodeAlone(int **Barr, int **circles, int N, int M) {
   int startX = posX;
   int startY = posY;
   bool isCircleFreakingNotCompleted = true;
+  bool solutionImpossible = false;
   if (posX - 1 >= 0 && circles[posX - 1][posY] == WHITE) {
     soluz[soluz_index++] = 'U'; posX--;
   } else if (posX + 1 < N && circles[posX + 1][posY] == WHITE) {
@@ -1344,26 +1349,9 @@ bool LeaveMySpagettiCodeAlone(int **Barr, int **circles, int N, int M) {
     soluz[soluz_index++] = 'R'; posY++;
   }
 
-  while (isCircleFreakingNotCompleted && (circles[posX][posY] != WHITE || circles[posX][posY] != BLACK) && posY >= 0 && posY < M && posX >= 0 && posX < N) {
-
-    if (!(posY >= 0)) {
-      cout << "posY >= 0" << endl; 
-    }
-    if(!(posY + 1 < M)) {
-      cout << "posY + 1 < M" << endl; 
-    } 
-    if(!(posX >= 0)) {
-      cout << "posX >= 0" << endl; 
-    } 
-    if(!(posX + 1 < N)) {
-      cout << "posX + 1 < N" << endl; 
-    }
-
-
+  while (!solutionImpossible && isCircleFreakingNotCompleted && (circles[posX][posY] != WHITE || circles[posX][posY] != BLACK) && posY >= 0 && posY < M && posX >= 0 && posX < N) {
     if (circles[posX][posY] == WHITE) {
-      cout << "I'm white" << endl;
       if (soluz[soluz_index - 1] == 'U') {
-        cout << "Going up " << endl;
         soluz[soluz_index++] = 'U'; posX--;
         if (circles[posX][posY] == BLACK) {
           if (posX == startX && posY == startY) {
@@ -1374,7 +1362,6 @@ bool LeaveMySpagettiCodeAlone(int **Barr, int **circles, int N, int M) {
             soluz[soluz_index++] = 'R'; posY++;
           }
         } else if (circles[posX][posY] == WHITE) {
-          cout << "Doing nothing" << endl;
           // White after a white, now doing nothing
         } else if (posX - 1 >= 0 && posY - 1 >= 0 && circles[posX - 1][posY - 1] == WHITE) {
           soluz[soluz_index++] = 'L'; posY--;
@@ -1448,9 +1435,9 @@ bool LeaveMySpagettiCodeAlone(int **Barr, int **circles, int N, int M) {
         int theNextBlack = -1;
         char nextDirection = 'x';
         if (soluz[soluz_index - 1] == 'U' || soluz[soluz_index - 1] == 'D'){ // Check row
-          if(circles[posX][posY - 1] == WHITE) {
+          if(posY - 1 >= 0 && circles[posX][posY - 1] == WHITE) {
             soluz[soluz_index++] = 'L'; posY--;
-          } else if(circles[posX][posY + 1] == WHITE) {
+          } else if(posY + 1 < M && circles[posX][posY + 1] == WHITE) {
             soluz[soluz_index++] = 'R'; posY++;
           } else {
             if (posY != M-1) {
@@ -1471,9 +1458,9 @@ bool LeaveMySpagettiCodeAlone(int **Barr, int **circles, int N, int M) {
             }
           }
         } else if (soluz[soluz_index - 1] == 'R' || soluz[soluz_index - 1] == 'L') { // Check column
-          if(circles[posX - 1][posY] == WHITE) {
+          if(posX - 1 >= 0 && circles[posX - 1][posY] == WHITE) {
             soluz[soluz_index++] = 'U'; posX--;
-          } else if(circles[posX + 1][posY] == WHITE) {
+          } else if(posX + 1 < N && circles[posX + 1][posY] == WHITE) {
             soluz[soluz_index++] = 'D'; posX++;
           } else {
             if (posX != N-1) {
@@ -1497,47 +1484,377 @@ bool LeaveMySpagettiCodeAlone(int **Barr, int **circles, int N, int M) {
           cout << "Error: What shoud it be?";
         }
       }
-        
-      // else {
-      //   cout << "theNextBlack " << theNextBlack << endl;
-      //   if (nextDirection == 'U') {
-      //     while (circles[posX][posY] != BLACK) {
-      //       soluz[soluz_index++] = 'U'; posX--;
-      //     }
-      //   } else if (nextDirection == 'D') {
-      //     while (circles[posX][posY] != BLACK) {
-      //       soluz[soluz_index++] = 'D'; posX++;
-      //     }
-      //   } else if (nextDirection == 'L') {
-      //     while (circles[posX][posY] != BLACK) {
-      //       soluz[soluz_index++] = 'L'; posY--;
-      //     }
-      //   } else if (nextDirection == 'R') {
-      //     while (circles[posX][posY] != BLACK) {
-      //       cout << "Inside while" << endl;
-      //       soluz[soluz_index++] = 'R'; posY++;
-      //     }
-      //     cout << "Outside while" << endl;
-      //   } else { 
-      //     cout << "Error in getting direction" << endl;
-      //   }
-      // }
-      
-      // isCircleFreakingNotCompleted = false;
-
     } else {
-      if (soluz[soluz_index - 1] == 'L') {
+      if (posY - 1 >= 0 && soluz[soluz_index - 1] == 'L') {
         soluz[soluz_index++] = 'L'; posY--;
-      } else if (soluz[soluz_index - 1] == 'R') {
+      } else if (posY + 1 < M && soluz[soluz_index - 1] == 'R') {
         soluz[soluz_index++] = 'R'; posY++;
-      } else if (soluz[soluz_index - 1] == 'D') {
+      } else if (posX + 1 < N && soluz[soluz_index - 1] == 'D') {
         soluz[soluz_index++] = 'D'; posX++;
-      } else if (soluz[soluz_index - 1] == 'U') {
+      } else if (posX - 1 >= 0 && soluz[soluz_index - 1] == 'U') {
         soluz[soluz_index++] = 'U'; posX--;
+      } else {
+        solutionImpossible = true;
       }
     }
   }
-  // TODO remove foundCircles above
+  posX = startX;
+  posY = startY;
+  int foundCircles = 0;
+  for (int i = 0; i < soluz_index; i++) {
+    if (circles[posX][posY] == BLACK || circles[posX][posY] == WHITE)
+      foundCircles++;
+    if (soluz[i] == 'U')
+      posX--;
+    else if (soluz[i] == 'D')
+      posX++;
+    else if (soluz[i] == 'L')
+      posY--;
+    else if (soluz[i] == 'R')
+      posY++;
+  }
+
+  out << foundCircles;
+  out << " ";
+  out << soluz_index;
+  out << " ";
+  out << startX;
+  out << " ";
+  out << startY;
+  out << " ";
+  for (int i = 0; i < soluz_index; i++) {
+    out << soluz[i];
+  }
+  out << "#";
+  bestSolution = foundCircles;
+  return !isCircleFreakingNotCompleted;
+}
+
+int shorterIsBetter(int **Warr, int **visited, int W, int x, int y) {
+  vector<pair<int, int>> distances;
+  for (int i = 0; i < W; ++i) {
+    pair<int, int> tmp;
+
+    if (visited[Warr[i][0]][Warr[i][1]] != 1) {
+      double distance = sqrt(pow(x - Warr[i][0], 2) + pow(y - Warr[i][1], 2));
+      tmp.first = distance;
+      tmp.second = i;
+      distances.push_back(tmp);
+    }
+  }
+
+  sort(distances.begin(), distances.end());
+  return distances[0].second;
+}
+void goUp(char *soluz, int *soluz_index, int **visited, int *posX, int *posY) {
+  soluz[(*soluz_index)++] = 'U';
+  (*posX)--;
+  visited[*posX][*posY] = 1;
+}
+void goDown(char *soluz, int *soluz_index, int **visited, int *posX,
+            int *posY) {
+  soluz[(*soluz_index)++] = 'D';
+  (*posX)++;
+  visited[*posX][*posY] = 1;
+}
+void goLeft(char *soluz, int *soluz_index, int **visited, int *posX,
+            int *posY) {
+  soluz[(*soluz_index)++] = 'L';
+  (*posY)--;
+  visited[*posX][*posY] = 1;
+}
+void goRight(char *soluz, int *soluz_index, int **visited, int *posX,
+             int *posY) {
+  soluz[(*soluz_index)++] = 'R';
+  (*posY)++;
+  visited[*posX][*posY] = 1;
+}
+
+
+void drawLine(char *soluz, int *soluz_index, int **visited, int *posX,
+              int *posY, int nextX, int nextY, int **circles, int N, int M) {
+  if (*posY<nextY && * posX> nextX) { // To right up
+    bool theRealFlag = false;
+    if (nextX - 1 >= 0 && circles[nextX - 1][nextY] == BLACK) {
+      theRealFlag = true;
+    }
+    goRight(soluz, soluz_index, visited, posX, posY);
+    int finish = nextX;
+    if (theRealFlag)
+      finish++;
+    while (*posX != finish) {
+      goUp(soluz, soluz_index, visited, posX, posY);
+    }
+    while (*posY != nextY) {
+      goRight(soluz, soluz_index, visited, posX, posY);
+    }
+    if (theRealFlag)
+      goUp(soluz, soluz_index, visited, posX, posY);
+  } else if (*posY < nextY && *posX < nextX) { // To down right
+    bool theRealFlag = false;
+    if (nextX + 1 < N && circles[nextX + 1][nextY] == BLACK) {
+      theRealFlag = true;
+    }
+    goRight(soluz, soluz_index, visited, posX, posY);
+    int finish = nextX;
+    if (theRealFlag)
+      finish--;
+    while (*posX != finish) {
+      goDown(soluz, soluz_index, visited, posX, posY);
+    }
+    while (*posY != nextY) {
+      goRight(soluz, soluz_index, visited, posX, posY);
+    }
+    if (theRealFlag)
+      goDown(soluz, soluz_index, visited, posX, posY);
+  } else if (*posY > nextY && *posX < nextX) { // To down left
+    bool theRealFlag = false;
+    if (nextX + 1 < N && circles[nextX + 1][nextY] == BLACK) {
+      theRealFlag = true;
+    }
+    goLeft(soluz, soluz_index, visited, posX, posY);
+    int finish = nextX;
+    if (theRealFlag)
+      finish--;
+    while (*posX != finish) {
+      goDown(soluz, soluz_index, visited, posX, posY);
+    }
+    while (*posY != nextY) {
+      goLeft(soluz, soluz_index, visited, posX, posY);
+    }
+    if (theRealFlag)
+      goDown(soluz, soluz_index, visited, posX, posY);
+  } else if (*posY > nextY && *posX > nextX) { // To Up Left
+    bool theRealFlag = false;
+    if (nextX - 1 >= 0 && circles[nextX - 1][nextY] == BLACK) {
+      theRealFlag = true;
+    }
+    goLeft(soluz, soluz_index, visited, posX, posY);
+    int finish = nextX;
+    if (theRealFlag)
+      finish++;
+    while (*posX != finish) {
+      goUp(soluz, soluz_index, visited, posX, posY);
+    }
+    while (*posY != nextY) {
+      goLeft(soluz, soluz_index, visited, posX, posY);
+    }
+    if (theRealFlag)
+      goUp(soluz, soluz_index, visited, posX, posY);
+  }
+}
+
+
+bool TheSpaghettinoRevenge(int **Warr, int **Barr, int **circles, int N, int M, int B, int W, int **visited) {
+  ofstream out(OUTPUT);
+  char soluz[N * M + 1];
+  int soluz_index = 0;
+  bool solutionImpossible = false;
+  bool isCircleFreakingNotCompleted = true;
+  int posX, posY;
+  int startX, startY;
+  if (circles[0][0] == BLACK) { // Go right or down
+    startX = posX = 0;
+    startY = posY = 0;
+    goRight(soluz, &soluz_index, visited, &posX, &posY);
+    goRight(soluz, &soluz_index, visited, &posX, &posY);
+  } else if (circles[N-1][0] == BLACK) { // Up or right
+    startX = posX = N-1;
+    startY = posY = 0;
+    goRight(soluz, &soluz_index, visited, &posX, &posY);
+    goRight(soluz, &soluz_index, visited, &posX, &posY);
+  } else if (circles[0][M-1] == BLACK) { // Down or left
+    startX = posX = 0;
+    startY = posY = M-1;
+    goLeft(soluz, &soluz_index, visited, &posX, &posY);
+    goLeft(soluz, &soluz_index, visited, &posX, &posY);
+  } else if (circles[N-1][M-1] == BLACK) { // Up or left
+    startX = posX = N-1;
+    startY = posY = M-1;
+    goLeft(soluz, &soluz_index, visited, &posX, &posY);
+    goLeft(soluz, &soluz_index, visited, &posX, &posY);
+  } else  {
+    solutionImpossible = true;
+  }
+
+  if (solutionImpossible == true) {
+    cout << "solutionImpossible " << posX << " " << posY << endl; 
+  }
+  // 0 non visited
+  // 1 visited
+  while (!solutionImpossible && isCircleFreakingNotCompleted && posY >= 0 && posY < M && posX >= 0 && posX < N) {
+    visited[posX][posY] = 1;
+    int nextIndex = shorterIsBetter(Warr, visited, W, posX, posY);
+    int nextX = Warr[nextIndex][0];
+    int nextY = Warr[nextIndex][1];
+    
+    if (circles[posX][posY] == WHITE) {
+      cout << "White " << posX << " " << posY << endl;
+      if (soluz[soluz_index - 1] == 'U') {
+        goUp(soluz, &soluz_index, visited, &posX, &posY);
+        if (circles[posX][posY] == BLACK) {
+          if (posX == startX && posY == startY) {
+            isCircleFreakingNotCompleted = false;
+          } else if(posY - 1 >= 0 && circles[posX][posY - 1] == WHITE) {
+            goLeft(soluz, &soluz_index, visited, &posX, &posY);
+          } else if(posY + 1 < M && circles[posX][posY + 1] == WHITE) {
+            goRight(soluz, &soluz_index, visited, &posX, &posY);
+          }
+        } else if (circles[posX][posY] == WHITE) {
+          // White after a white, now doing nothing
+        } else if (posX - 1 >= 0 && posY - 1 >= 0 && circles[posX - 1][posY - 1] == WHITE) {
+          goLeft(soluz, &soluz_index, visited, &posX, &posY);
+          goUp(soluz, &soluz_index, visited, &posX, &posY);
+        } else if (posX - 1 >= 0 && posY + 1 < M && circles[posX - 1][posY + 1] == WHITE) {
+          goRight(soluz, &soluz_index, visited, &posX, &posY);
+          goUp(soluz, &soluz_index, visited, &posX, &posY);
+        } else {
+          drawLine(soluz, &soluz_index, visited, &posX, &posY, nextX, nextY, circles, N, M);
+        }
+      } else if (soluz[soluz_index - 1] == 'L') {
+        goLeft(soluz, &soluz_index, visited, &posX, &posY);
+        if (circles[posX][posY] == BLACK) {
+          if (posX == startX && posY == startY) {
+            isCircleFreakingNotCompleted = false;
+          } else if(posX + 1 < N && circles[posX + 1][posY] == WHITE) {
+            goDown(soluz, &soluz_index, visited, &posX, &posY);
+          } else if(posX - 1 >= 0 && circles[posX - 1][posY] == WHITE) {
+            goUp(soluz, &soluz_index, visited, &posX, &posY);
+          }
+        } else if (circles[posX][posY] == WHITE) {
+          // White after a white, now doing nothing
+        } else if (posX - 1 >= 0 && posY - 1 >= 0 && circles[posX - 1][posY - 1] == WHITE) {
+          goUp(soluz, &soluz_index, visited, &posX, &posY);
+          goLeft(soluz, &soluz_index, visited, &posX, &posY);
+        } else if (posX + 1 < N && posY - 1 >= 0 && circles[posX + 1][posY - 1] == WHITE) {
+          goDown(soluz, &soluz_index, visited, &posX, &posY);
+          goLeft(soluz, &soluz_index, visited, &posX, &posY);
+        } else if (posX - 2 >= 0 && circles[posX - 2][posY] == WHITE) {
+          goUp(soluz, &soluz_index, visited, &posX, &posY);
+          goUp(soluz, &soluz_index, visited, &posX, &posY);
+        } else if (posX + 2 < N && circles[posX + 2][posY] == WHITE) {
+          goDown(soluz, &soluz_index, visited, &posX, &posY);
+          goDown(soluz, &soluz_index, visited, &posX, &posY);
+        } else {
+          drawLine(soluz, &soluz_index, visited, &posX, &posY, nextX, nextY, circles, N, M);
+        }
+      } else if (soluz[soluz_index - 1] == 'D') {
+        goDown(soluz, &soluz_index, visited, &posX, &posY);
+        if (circles[posX][posY] == BLACK) {
+          if (posX == startX && posY == startY) {
+            isCircleFreakingNotCompleted = false;
+          } else if(posY - 1 >= 0 && circles[posX][posY - 1] == WHITE) {
+            goLeft(soluz, &soluz_index, visited, &posX, &posY);
+          } else if (posY + 1 < M && circles[posX][posY + 1] == WHITE) {
+            goRight(soluz, &soluz_index, visited, &posX, &posY);
+          }
+        } else if (circles[posX][posY] == WHITE) {
+          // White after a white, now doing nothing
+        } else if (posX + 1 < N && posY - 1 >= 0 && circles[posX + 1][posY - 1] == WHITE) {
+          soluz[soluz_index++] = 'L'; posY--;
+          goDown(soluz, &soluz_index, visited, &posX, &posY);
+        } else if (posX + 1 < N && posY + 1 < M && circles[posX + 1][posY + 1] == WHITE) {
+          goRight(soluz, &soluz_index, visited, &posX, &posY);
+          goDown(soluz, &soluz_index, visited, &posX, &posY);
+        } else {
+          drawLine(soluz, &soluz_index, visited, &posX, &posY, nextX, nextY, circles, N, M);
+        }
+      } else if (soluz[soluz_index - 1] == 'R') {
+        goRight(soluz, &soluz_index, visited, &posX, &posY);
+        if (circles[posX][posY] == BLACK) {
+          if (posX == startX && posY == startY) {
+            isCircleFreakingNotCompleted = false;
+          } else if(posX + 1 < N && circles[posX + 1][posY] == WHITE) {
+            goDown(soluz, &soluz_index, visited, &posX, &posY);
+          } else if(posX - 1 >= 0 && circles[posX - 1][posY] == WHITE) {
+            goUp(soluz, &soluz_index, visited, &posX, &posY);
+          }
+        } else if (circles[posX][posY] == WHITE) {
+          // White after a white, now doing nothing
+        } else if (posX - 1 >= 0 && posY + 1 < M && circles[posX - 1][posY + 1] == WHITE) {
+          goUp(soluz, &soluz_index, visited, &posX, &posY);
+          goRight(soluz, &soluz_index, visited, &posX, &posY);
+        } else if (posX + 1 < N && posY + 1 < M && circles[posX + 1][posY + 1] == WHITE) {
+          goDown(soluz, &soluz_index, visited, &posX, &posY);
+          goRight(soluz, &soluz_index, visited, &posX, &posY);
+        } else {
+          drawLine(soluz, &soluz_index, visited, &posX, &posY, nextX, nextY, circles, N, M);
+        }
+      }
+    } else if (circles[posX][posY] == BLACK) {
+      cout << "Black " << posX << " " << posY << endl;
+      if (posX == startX && posY == startY) {
+        isCircleFreakingNotCompleted = false;
+      } else {
+        int theNextBlack = -1;
+        char nextDirection = 'x';
+        if (soluz[soluz_index - 1] == 'U' || soluz[soluz_index - 1] == 'D'){ // Check row
+          if(posY - 1 >= 0 && circles[posX][posY - 1] == WHITE) {
+            goLeft(soluz, &soluz_index, visited, &posX, &posY);
+          } else if(posY + 1 < M && circles[posX][posY + 1] == WHITE) {
+            goRight(soluz, &soluz_index, visited, &posX, &posY);
+          } else {
+            if (posY != M-1) {
+              for (int i = posY+1; i < M; i++){ // Increasing, going right
+                if (circles[posX][i] == BLACK && theNextBlack == -1) {
+                  theNextBlack = i;
+                  goRight(soluz, &soluz_index, visited, &posX, &posY);
+                }
+              }
+            }
+            if (posY != 0) {
+              for (int i = posY-1; i >= 0; i--){ // Descreasing, going left
+                if (circles[posX][i] == BLACK && theNextBlack == -1) {
+                  theNextBlack = i;
+                  goLeft(soluz, &soluz_index, visited, &posX, &posY);
+                }
+              }
+            }
+          }
+        } else if (soluz[soluz_index - 1] == 'R' || soluz[soluz_index - 1] == 'L') { // Check column
+          if(posX - 1 >= 0 && circles[posX - 1][posY] == WHITE) {
+            goUp(soluz, &soluz_index, visited, &posX, &posY);
+          } else if(posX + 1 < N && circles[posX + 1][posY] == WHITE) {
+            goDown(soluz, &soluz_index, visited, &posX, &posY);
+          } else {
+            if (posX != N-1) {
+              for (int i = posX+1; i < N; i++){ // Increasing, going down
+                if (circles[i][posY] == BLACK && theNextBlack == -1) {
+                  theNextBlack = i;
+                  goDown(soluz, &soluz_index, visited, &posX, &posY);
+                }
+              }
+            }
+            if (posX != 0) {
+              for (int i = posX-1; i >= 0; i--){ // Descreasing, going up
+                if (circles[i][posY] == BLACK && theNextBlack == -1) {
+                  theNextBlack = i;
+                  goUp(soluz, &soluz_index, visited, &posX, &posY);
+                }
+              }
+            }
+          }
+        } else {
+          cout << "Error: What shoud it be?";
+        }
+      }
+    } else {
+      cout << "Nor white nor black " << posX << " " << posY << endl;
+      if (posY - 1 >= 0 && soluz[soluz_index - 1] == 'L') {
+        goLeft(soluz, &soluz_index, visited, &posX, &posY);
+      } else if (posY + 1 < M && soluz[soluz_index - 1] == 'R') {
+        goRight(soluz, &soluz_index, visited, &posX, &posY);
+      } else if (posX + 1 < N && soluz[soluz_index - 1] == 'D') {
+        goDown(soluz, &soluz_index, visited, &posX, &posY);
+      } else if (posX - 1 >= 0 && soluz[soluz_index - 1] == 'U') {
+        goUp(soluz, &soluz_index, visited, &posX, &posY);
+      } else {
+        solutionImpossible = true;
+      }
+    }
+  }
+
+  // Count circles
   posX = startX;
   posY = startY;
   int foundCircles = 0;
@@ -1580,6 +1897,10 @@ int main() {
   int **track = new int *[N];
   for (int i = 0; i < N; i++)
     track[i] = new int[M];
+
+  int **visited = new int *[N];
+  for (int i = 0; i < N; i++)
+    visited[i] = new int[M];
 
   int **circles = new int *[N];
   for (int i = 0; i < N; i++)
@@ -1687,17 +2008,20 @@ int main() {
     }
   }
   
-  // LeaveMySpagettiCodeAlone(Barr, circles, N, M);
+  // LeaveMySpaghettiCodeAlone(Barr, circles, N, M);
 
-  if (LeaveMySpagettiCodeAlone(Barr, circles, N, M)) {
+  if (LeaveMySpaghettiCodeAlone(Barr, circles, N, M)) {
     // Buona
-  } else if (B == 4) { // Added also if it's slightly useless
-    rectangularPath(N, M, track, circles, B, W, Barr, Warr);
-  } else if (circlesCount == B + W && !supremeFlagOfTheGod) {
-    superAlgorithmForInput12(Barr, circles, N, M);
-  } else {
-    algoritmoTontolo(N, M, track, circles, B + W, Warr, Barr, W, B);
+  } else if (TheSpaghettinoRevenge(Warr, Barr, circles, N, M, B, W, visited)) {
+    // Another case
   }
+  //  else if (B == 4) { // Added also if it's slightly useless
+  //   rectangularPath(N, M, track, circles, B, W, Barr, Warr);
+  // } else if (circlesCount == B + W && !supremeFlagOfTheGod) {
+  //   superAlgorithmForInput12(Barr, circles, N, M);
+  // } else {
+  //   algoritmoTontolo(N, M, track, circles, B + W, Warr, Barr, W, B);
+  // }
 
   // for (int i = 0; i < N; i++) {
   //   for (int j = 0; j < M; j++) {
