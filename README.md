@@ -30,6 +30,10 @@ Open the output image:
 ./output/out_0.jpg
 ```
 
+## Result
+
+![input11](https://i.imgur.com/kqv8cTL.png)
+
 ## The problem
 
 ![problem pt1](https://i.imgur.com/WJpR2E6.png)
