@@ -1,1 +1,4 @@
 swrace
+output/
+output/*
+output.txt
